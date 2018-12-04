@@ -13,6 +13,7 @@ Window {
     title: qsTr("Telecomunication Chart")
 
     signal getFilePath(string filePath)
+    signal openChartWindow()
 
  /*   ListModel {
         id: fruitModel
@@ -172,6 +173,7 @@ Window {
         anchors.top: add_points_from_file.bottom
         anchors.right: parent.right
         onClicked: {
+            openChartWindow();
             var component = Qt.createComponent("chartWindow.qml")
             var window    = component.createObject(main_window)
             window.show()

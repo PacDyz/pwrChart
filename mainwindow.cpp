@@ -1,20 +1,25 @@
 #include "mainwindow.h"
-#include <iostream>
-#include <fstream>
-#include <QDir>
-#include <algorithm>
-#include <QQmlContext>
 #include <QDebug>
-
-MainWindow::MainWindow(QWidget *parent):engine{}
+#include <QDir>
+#include <QQmlContext>
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include "ChartWindow.hpp"
+MainWindow::MainWindow(QWidget* parent) : engine{}
 {
-    QQmlContext *context = engine.rootContext();
+    QQmlContext* context = engine.rootContext();
     context->setContextProperty("ListWithValuesModel", &listWithValues);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty())
-        std::cout << "error" << std::endl;
-    QObject *mainWindowQml = engine.rootObjects().first();
+    if (engine.rootObjects().isEmpty()) std::cout << "error" << std::endl;
+    QObject* mainWindowQml = engine.rootObjects().first();
     QObject::connect(mainWindowQml, SIGNAL(getFilePath(QString)), this, SLOT(setFilePath(QString)));
+    QObject::connect(mainWindowQml, SIGNAL(openChartWindow()), this, SLOT(openChart()));
+}
+
+void MainWindow::openChart()
+{
+    ChartWindow chartWindow;
 }
 
 void MainWindow::setFilePath(QString filePath)
@@ -25,9 +30,9 @@ void MainWindow::setFilePath(QString filePath)
     float number{0};
     bool isFirstValue = true;
     A a;
-    while(myfile >> number)
+    while (myfile >> number)
     {
-        if(isFirstValue)
+        if (isFirstValue)
         {
             a.time = QString::number(number);
             valuesA.push_back(number);
@@ -39,17 +44,16 @@ void MainWindow::setFilePath(QString filePath)
         a.averageAmplitude = QString::number(number);
         valuesB.push_back(number);
         isFirstValue = true;
-        qDebug()<< "a = " << a.time <<" " << a.averageAmplitude;
+        qDebug() << "a = " << a.time << " " << a.averageAmplitude;
         listWithValues.append(a);
         a.time = "";
         a.averageAmplitude = "";
-
     }
-    for(const auto& itr : valuesA)
+    for (const auto& itr : valuesA)
     {
         std::cout << itr << std::endl;
     }
-    for(const auto& itr : valuesB)
+    for (const auto& itr : valuesB)
     {
         std::cout << itr << std::endl;
     }
