@@ -2,6 +2,7 @@
 #define CHARTWINDOW_H
 #include <QMainWindow>
 #include <QQmlApplicationEngine>
+#include "TelecomunicationChart.hpp"
 
 class ChartWindow : public QMainWindow
 {
@@ -11,7 +12,10 @@ public:
 
 public slots:
 
+signals:
+
 private:
+    TelecomunicationChart* telecomunicationChart;
     QQmlApplicationEngine engine;
 };
 

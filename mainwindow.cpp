@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include "ChartWindow.hpp"
+
 MainWindow::MainWindow(QWidget* parent) : engine{}
 {
     QQmlContext* context = engine.rootContext();
@@ -19,7 +20,22 @@ MainWindow::MainWindow(QWidget* parent) : engine{}
 
 void MainWindow::openChart()
 {
-    ChartWindow chartWindow;
+    // ChartWindow chartWindow;
+    QLineSeries* series = new QLineSeries();
+    for (uint32_t i = 0; i < valuesA.size(); ++i)
+    {
+        series->append(valuesA.at(i), valuesB.at(i));
+    }
+    QChart* chart = new QChart();
+    chart->legend()->hide();
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setTitle("Simple line chart example");
+    QChartView* chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    this->setCentralWidget(chartView);
+    this->resize(400, 300);
+    this->show();
 }
 
 void MainWindow::setFilePath(QString filePath)

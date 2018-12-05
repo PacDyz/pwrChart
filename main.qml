@@ -15,23 +15,6 @@ Window {
     signal getFilePath(string filePath)
     signal openChartWindow()
 
- /*   ListModel {
-        id: fruitModel
-
-        ListElement {
-            name: "Apple"
-            cost: 2.45
-        }
-        ListElement {
-            name: "Orange"
-            cost: 3.25
-        }
-        ListElement {
-            name: "Banana"
-            cost: 1.95
-        }
-    }*/
-
     Component {
         id: highlightBar
         Rectangle {
@@ -174,9 +157,9 @@ Window {
         anchors.right: parent.right
         onClicked: {
             openChartWindow();
-            var component = Qt.createComponent("chartWindow.qml")
+/*            var component = Qt.createComponent("chartWindow.qml")
             var window    = component.createObject(main_window)
-            window.show()
+            window.show()*/
         }
     }
 }
