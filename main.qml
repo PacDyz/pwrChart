@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.3
+import QtQuick.Controls 2.3
 //import org.example 1.0
 
 Window {
@@ -26,22 +27,39 @@ Window {
         }
     }
 
+    Label
+    {
+        id: values_label
+        width: parent.width/2
+        height: first_value_edit.height + first_value_label.height
+        anchors.top: parent.top
+        text: "N" + "              " +  "A" + "              " + "B"
+        font.pixelSize: 26
+        horizontalAlignment: Text.AlignHCenter
+    }
+
     ListView {
         id: values_list
+        clip: true
         width: parent.width/2
-        anchors.right: first_value_edit.left
+        height: parent.height - values_label.height
+        anchors.right: values_label.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.top: parent.top
+        anchors.top: values_label.bottom
         model:ListWithValuesModel
             delegate:     Component {
                 id: delegate_component
                 Item {
                     id: wrapper
                     width: main_window.width/2
-                    height: main_window.height/6
+                    height: main_window.height/6 - values_label.height/6
                         Column {
-                        Text { text: model.time + "     " + model.averageAmplitude }
+                        Text { text: index + 1 + "              " + model.time + "              " + model.averageAmplitude
+                        width: wrapper.width
+                        height: wrapper.height
+                        font.pixelSize: 26
+                        horizontalAlignment: Text.AlignHCenter}
                     }
                         MouseArea {
                             anchors.fill: parent
