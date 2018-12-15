@@ -15,6 +15,7 @@ Window {
 
     signal getFilePath(string filePath)
     signal openChartWindow()
+    signal saveConfiguration(int from, int to)
 
     Component {
         id: highlightBar
@@ -74,7 +75,7 @@ Window {
     Label {
         id: first_value_label
         width: parent.width/4
-        text: "A"
+        text: "From"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"
@@ -87,7 +88,8 @@ Window {
     TextEdit {
         id: first_value_edit
         width: parent.width/4
-        text: "10"
+        inputMethodHints: Qt.ImhFormattedNumbersOnly
+        text: "0"
         font.family: "Helvetica"
         font.pointSize: 14
         focus: true
@@ -100,7 +102,7 @@ Window {
     Label {
         id: second_value_label
         width: parent.width/4
-        text: "B"
+        text: "To"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"
@@ -113,7 +115,8 @@ Window {
     TextEdit {
         id: second_value_edit
         width: parent.width/4
-        text: "10"
+        inputMethodHints: Qt.ImhFormattedNumbersOnly
+        text: "24"
         font.family: "Helvetica"
         font.pointSize: 14
         focus: true
@@ -126,11 +129,14 @@ Window {
 
     Button {
         id: add_point
-        text: "Add Point"
+        text: "Save Configuration"
         width: parent.width/2
         height: parent.height/6
         anchors.right: parent.right
         anchors.top: first_value_edit.bottom
+        onClicked: {
+        saveConfiguration(parseInt(first_value_edit.text), parseInt(second_value_edit.text))
+        }
 
     }
 

@@ -13,12 +13,15 @@ public:
 public slots:
     void setFilePath(QString filePath);
     void openChart();
+    void saveRangeChart(int from, int to);
 
 private:
     std::vector<float> valuesA;
     std::vector<float> valuesB;
     QQmlApplicationEngine engine;
     ListWithValues listWithValues;
+    int from{0};
+    int to{24};
 };
 
 #endif // MAINWINDOW_H

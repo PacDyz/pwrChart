@@ -16,25 +16,58 @@ MainWindow::MainWindow(QWidget* parent) : engine{}
     QObject* mainWindowQml = engine.rootObjects().first();
     QObject::connect(mainWindowQml, SIGNAL(getFilePath(QString)), this, SLOT(setFilePath(QString)));
     QObject::connect(mainWindowQml, SIGNAL(openChartWindow()), this, SLOT(openChart()));
+    QObject::connect(mainWindowQml, SIGNAL(saveConfiguration(int, int)), this, SLOT(saveRangeChart(int,int)));
+}
+
+void MainWindow::saveRangeChart(int from, int to)
+{
+    std::cout << "range " << from << " " << to << std::endl;
+    this->from = from;
+    this->to = to;
+    std::cout << "range " << this->from << " " << this->to << std::endl;
 }
 
 void MainWindow::openChart()
 {
     // ChartWindow chartWindow;
+    std::cout << "from " << from << std::endl;
+    std::cout << "to " << to  << std::endl;
     QLineSeries* series = new QLineSeries();
+    std::vector<std::pair<int, int>> numberConnectionOnHour;
+    for(int h = from; h <= to; ++h)
+    {
+        numberConnectionOnHour.push_back({h,0});
+    }
     for (uint32_t i = 0; i < valuesA.size(); ++i)
     {
-        series->append(valuesA.at(i), valuesB.at(i));
+        auto itr = std::find_if(std::begin(numberConnectionOnHour), std::end(numberConnectionOnHour),
+                     [this, &i](auto par)
+        {return (par.first >= static_cast<int>(valuesA.at(i) +1)) &&
+                    (par.first <= static_cast<int>(valuesB.at(i) + valuesA.at(i) + 1));});
+        if(itr != std::end(numberConnectionOnHour))
+        {
+            itr->second++;
+        }
+        //series->append(valuesA.at(i) + 1, valuesB.at(i));
     }
+    for(const auto& itr : numberConnectionOnHour)
+    {
+       series->append(itr.first, itr.second);
+    }
+    numberConnectionOnHour.clear();
     QChart* chart = new QChart();
+    QValueAxis *axisX = new QValueAxis;
+    axisX->setTickCount(10);
+    chart->addAxis(axisX, Qt::AlignBottom);
     chart->legend()->hide();
     chart->addSeries(series);
+    series->attachAxis(axisX);
     chart->createDefaultAxes();
-    chart->setTitle("Simple line chart example");
+    chart->setTitle("Aplitude");
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     this->setCentralWidget(chartView);
-    this->resize(400, 300);
+    this->resize(700, 500);
     this->show();
 }
 
