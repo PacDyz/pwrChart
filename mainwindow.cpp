@@ -55,7 +55,13 @@ void MainWindow::openChart()
     {
        series->append(itr.first, itr.second);
     }*/
-    for(int i = 0; i < valuesA.size(); ++i )
+    int numberElements{valuesA.size()};
+    if(valuesB.size() < valuesA.size())
+    {
+        numberElements = valuesB.size();
+    }
+    std::cout <<"sizeA = " << valuesA.size() << "sizeB = " << valuesB.size() << std::endl;
+    for(int i = 0; i < numberElements; ++i )
     {
         series->append(valuesA.at(i), valuesB.at(i));
     }
@@ -78,7 +84,6 @@ void MainWindow::openChart()
 
 void MainWindow::setFilePath(QString filePath)
 {
-    bool firstFile = true;
     const QUrl url(filePath);
     std::fstream myfile(QDir::toNativeSeparators(url.toLocalFile()).toUtf8().constData(), std::ios_base::in);
     std::cout << filePath.toUtf8().constData() << std::endl;
@@ -89,6 +94,7 @@ void MainWindow::setFilePath(QString filePath)
     int sumConnections = 0;
     std::string word;
     bool isFirstColumn = true;
+        int counterRow = 0;
     if(!firstFile)
     {
         while(myfile >> word)
@@ -96,22 +102,32 @@ void MainWindow::setFilePath(QString filePath)
             if(not isFirstColumn)
             {
                 auto itr = word.find("E-05");
-                if(itr == std::string::npos)
+                if(itr != std::string::npos)
                 {
                         word.erase(itr, 4);
                         valuesB.push_back(atoi( word.c_str() ) / std::pow(10,5) * averageConnectionTime);
                 }
                 valuesB.push_back(atoi( word.c_str() ) * averageConnectionTime);
+                a.averageAmplitude = QString::number(atoi( word.c_str()));
                 isFirstColumn = true;
+                qDebug() << "a = " << a.time << " " << a.averageAmplitude;
+                listWithValues.append(a);
+                a.time = "";
+                a.averageAmplitude = "";
+                counterRow++;
             }
             else
             {
+                a.time = QString::fromStdString(word);
+                valuesA.push_back(std::stoi( word));
+                std::cout << word << std::endl;
                 isFirstColumn = false;
+                continue;
             }
         }
     }
     isFirstColumn = true;
-    int counterRow = 0;
+//    int counterRow = 0;
     while (myfile >> number)
     {
         if(firstFile)
@@ -121,7 +137,7 @@ void MainWindow::setFilePath(QString filePath)
         }
         else
         {
-            if (isFirstValue)
+/*            if (isFirstValue)
             {
                 a.time = QString::number(number);
                 valuesA.push_back(number);
@@ -129,15 +145,15 @@ void MainWindow::setFilePath(QString filePath)
                 std::cout << number << std::endl;
                 continue;
             }
-            std::cout << number << std::endl;
-            a.averageAmplitude = QString::number(valuesB.at(counter));
+            std::cout << number << std::endl;*/
+//            a.averageAmplitude = QString::number(valuesB.at(counter));
 //            valuesB.push_back(number);
-            isFirstValue = true;
+/*            isFirstValue = true;
             qDebug() << "a = " << a.time << " " << a.averageAmplitude;
             listWithValues.append(a);
             a.time = "";
             a.averageAmplitude = "";
-            counterRow++;
+            counterRow++;*/
         }
     }
     if(!firstFile)
@@ -161,4 +177,5 @@ void MainWindow::setFilePath(QString filePath)
     sumConnections = 0;
     textButton.setTextButton("Add number of connection per minute");
     emit textButton.textButtonChanged();
+    firstFile = false;
 }

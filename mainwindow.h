@@ -25,6 +25,7 @@ private:
     int to{24};
     int averageConnectionTime{0};
     NameButton textButton;
+    bool firstFile{true};
 };
 
 #endif // MAINWINDOW_H
