@@ -6,11 +6,12 @@
 #include <fstream>
 #include <iostream>
 #include "ChartWindow.hpp"
-
 MainWindow::MainWindow(QWidget* parent) : engine{}
 {
+    textButton.setTextButton("Add time connections");
     QQmlContext* context = engine.rootContext();
     context->setContextProperty("ListWithValuesModel", &listWithValues);
+    context->setContextProperty("NameButton", &textButton);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty()) std::cout << "error" << std::endl;
     QObject* mainWindowQml = engine.rootObjects().first();
@@ -34,11 +35,11 @@ void MainWindow::openChart()
     std::cout << "to " << to  << std::endl;
     QLineSeries* series = new QLineSeries();
     std::vector<std::pair<int, int>> numberConnectionOnHour;
-    for(int h = from; h <= to; ++h)
+/*    for(int h = from*60; h <= to*60; ++h)
     {
         numberConnectionOnHour.push_back({h,0});
-    }
-    for (uint32_t i = 0; i < valuesA.size(); ++i)
+    }*/
+/*    for (uint32_t i = 0; i < valuesA.size(); ++i)
     {
         auto itr = std::find_if(std::begin(numberConnectionOnHour), std::end(numberConnectionOnHour),
                      [this, &i](auto par)
@@ -49,10 +50,14 @@ void MainWindow::openChart()
             itr->second++;
         }
         //series->append(valuesA.at(i) + 1, valuesB.at(i));
-    }
-    for(const auto& itr : numberConnectionOnHour)
+    }*/
+/*    for(const auto& itr : numberConnectionOnHour)
     {
        series->append(itr.first, itr.second);
+    }*/
+    for(int i = 0; i < valuesA.size(); ++i )
+    {
+        series->append(valuesA.at(i), valuesB.at(i));
     }
     numberConnectionOnHour.clear();
     QChart* chart = new QChart();
@@ -73,39 +78,87 @@ void MainWindow::openChart()
 
 void MainWindow::setFilePath(QString filePath)
 {
+    bool firstFile = true;
     const QUrl url(filePath);
     std::fstream myfile(QDir::toNativeSeparators(url.toLocalFile()).toUtf8().constData(), std::ios_base::in);
     std::cout << filePath.toUtf8().constData() << std::endl;
     float number{0};
     bool isFirstValue = true;
     A a;
+    int counter = 0;
+    int sumConnections = 0;
+    std::string word;
+    bool isFirstColumn = true;
+    if(!firstFile)
+    {
+        while(myfile >> word)
+        {
+            if(not isFirstColumn)
+            {
+                auto itr = word.find("E-05");
+                if(itr == std::string::npos)
+                {
+                        word.erase(itr, 4);
+                        valuesB.push_back(atoi( word.c_str() ) / std::pow(10,5) * averageConnectionTime);
+                }
+                valuesB.push_back(atoi( word.c_str() ) * averageConnectionTime);
+                isFirstColumn = true;
+            }
+            else
+            {
+                isFirstColumn = false;
+            }
+        }
+    }
+    isFirstColumn = true;
+    int counterRow = 0;
     while (myfile >> number)
     {
-        if (isFirstValue)
+        if(firstFile)
         {
-            a.time = QString::number(number);
-            valuesA.push_back(number);
-            isFirstValue = false;
-            std::cout << number << std::endl;
-            continue;
+            counter++;
+            sumConnections += number;
         }
-        std::cout << number << std::endl;
-        a.averageAmplitude = QString::number(number);
-        valuesB.push_back(number);
-        isFirstValue = true;
-        qDebug() << "a = " << a.time << " " << a.averageAmplitude;
-        listWithValues.append(a);
-        a.time = "";
-        a.averageAmplitude = "";
+        else
+        {
+            if (isFirstValue)
+            {
+                a.time = QString::number(number);
+                valuesA.push_back(number);
+                isFirstValue = false;
+                std::cout << number << std::endl;
+                continue;
+            }
+            std::cout << number << std::endl;
+            a.averageAmplitude = QString::number(valuesB.at(counter));
+//            valuesB.push_back(number);
+            isFirstValue = true;
+            qDebug() << "a = " << a.time << " " << a.averageAmplitude;
+            listWithValues.append(a);
+            a.time = "";
+            a.averageAmplitude = "";
+            counterRow++;
+        }
     }
-    for (const auto& itr : valuesA)
+    if(!firstFile)
     {
-        std::cout << itr << std::endl;
+        for (const auto& itr : valuesA)
+        {
+            std::cout << itr << std::endl;
+        }
+        for (const auto& itr : valuesB)
+        {
+            std::cout << itr << std::endl;
+        }
+        std::sort(valuesA.begin(), valuesA.end());
+        firstFile = true;
+        textButton.setTextButton("Add time connections");
+        emit textButton.textButtonChanged();
+        return;
     }
-    for (const auto& itr : valuesB)
-    {
-        std::cout << itr << std::endl;
-    }
-    std::sort(valuesA.begin(), valuesA.end());
-    std::cout << "HELLO" << std::endl;
+    averageConnectionTime = sumConnections/counter;
+    counter = 0;
+    sumConnections = 0;
+    textButton.setTextButton("Add number of connection per minute");
+    emit textButton.textButtonChanged();
 }

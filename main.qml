@@ -164,7 +164,7 @@ Window {
 
     Button {
         id: add_points_from_file
-        text: "Add points from file"
+        text: NameButton.textButton
         width: parent.width/2
         height: parent.height/6
         anchors.top: add_point.bottom

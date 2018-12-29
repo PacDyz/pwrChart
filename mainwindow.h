@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QQmlApplicationEngine>
 #include "listwithvalues.h"
+#include "namebutton.h"
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,8 @@ private:
     ListWithValues listWithValues;
     int from{0};
     int to{24};
+    int averageConnectionTime{0};
+    NameButton textButton;
 };
 
 #endif // MAINWINDOW_H
