@@ -6,8 +6,6 @@ ListWithValues::ListWithValues(QObject *parent)
     // initialize our data (QList<QString>) with a list of color names
     m_roleNames[TimeRole] = "time";
     m_roleNames[AverageAmplitudeRole] = "averageAmplitude";
-    A a{QString("10"), QString("15")};
-    m_data.append(a);
 }
 
 ListWithValues::~ListWithValues()
@@ -69,5 +67,6 @@ void ListWithValues::insert(int index, const A &a)
 
 void ListWithValues::append(const A &a)
 {
-    insert(m_data.count(), a);
+    auto itr = std::find_if(m_data.begin(), m_data.end(), [&a](const A& aList) {return (aList.time == a.time) || aList.time > a.time;});
+    insert(std::distance(m_data.begin(), itr), a);
 }

@@ -60,26 +60,32 @@ void MainWindow::openChart()
     {
         numberElements = valuesB.size();
     }
+    std::sort(valuesA.begin(), valuesA.end());
     std::cout <<"sizeA = " << valuesA.size() << "sizeB = " << valuesB.size() << std::endl;
     for(int i = 0; i < numberElements; ++i )
     {
+        std::cout << "value A " << valuesA.at(i) << "valuesB.at(i) = " << valuesB.at(i) << std::endl;
+        if(valuesA.at(i) > this->to*60)
+        {
+            break;
+        }
         series->append(valuesA.at(i), valuesB.at(i));
     }
     numberConnectionOnHour.clear();
     QChart* chart = new QChart();
-    QValueAxis *axisX = new QValueAxis;
-    axisX->setTickCount(10);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->legend()->hide();
+    //QValueAxis *axisX = new QValueAxis;
+    //axisX->setTickCount(10);
+    //chart->addAxis(axisX, Qt::AlignBottom);
+    //chart->legend()->hide();
     chart->addSeries(series);
-    series->attachAxis(axisX);
+    //series->attachAxis(axisX);
     chart->createDefaultAxes();
     chart->setTitle("Aplitude");
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    this->setCentralWidget(chartView);
-    this->resize(700, 500);
-    this->show();
+    window.setCentralWidget(chartView);
+    window.resize(1200, 800);
+    window.show();
 }
 
 void MainWindow::setFilePath(QString filePath)
@@ -108,7 +114,7 @@ void MainWindow::setFilePath(QString filePath)
                         valuesB.push_back(atoi( word.c_str() ) / std::pow(10,5) * averageConnectionTime);
                 }
                 valuesB.push_back(atoi( word.c_str() ) * averageConnectionTime);
-                a.averageAmplitude = QString::number(atoi( word.c_str()));
+                a.averageAmplitude = QString::number(atoi( word.c_str() ) * averageConnectionTime);
                 isFirstColumn = true;
                 qDebug() << "a = " << a.time << " " << a.averageAmplitude;
                 listWithValues.append(a);
@@ -158,15 +164,14 @@ void MainWindow::setFilePath(QString filePath)
     }
     if(!firstFile)
     {
-        for (const auto& itr : valuesA)
+/*        for (const auto& itr : valuesA)
         {
             std::cout << itr << std::endl;
         }
         for (const auto& itr : valuesB)
         {
             std::cout << itr << std::endl;
-        }
-        std::sort(valuesA.begin(), valuesA.end());
+        }*/
         firstFile = true;
         textButton.setTextButton("Add time connections");
         emit textButton.textButtonChanged();

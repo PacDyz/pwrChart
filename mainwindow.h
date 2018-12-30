@@ -26,6 +26,7 @@ private:
     int averageConnectionTime{0};
     NameButton textButton;
     bool firstFile{true};
+    QMainWindow window{};
 };
 
 #endif // MAINWINDOW_H
