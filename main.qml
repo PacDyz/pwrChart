@@ -9,8 +9,8 @@ Window {
     id: main_window
     objectName: "main_window"
     visible: true
-    width: 640
-    height: 480
+    width: 1000
+    height: 600
     title: qsTr("Telecomunication Chart")
 
     signal getFilePath(string filePath)
@@ -34,7 +34,7 @@ Window {
         width: parent.width/2
         height: first_value_edit.height + first_value_label.height
         anchors.top: parent.top
-        text: "N" + "              " +  "A" + "              " + "B"
+        text: "N" + "              " +  "t[min]" + "              " + "A[PM]"
         font.pixelSize: 26
         horizontalAlignment: Text.AlignHCenter
     }
@@ -75,7 +75,7 @@ Window {
     Label {
         id: first_value_label
         width: parent.width/4
-        text: "From"
+        text: "From [h]"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"
@@ -102,7 +102,7 @@ Window {
     Label {
         id: second_value_label
         width: parent.width/4
-        text: "To"
+        text: "To [h]"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"

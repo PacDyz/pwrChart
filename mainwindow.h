@@ -27,6 +27,7 @@ private:
     NameButton textButton;
     bool firstFile{true};
     QMainWindow window{};
+    int sumConnections;
 };
 
 #endif // MAINWINDOW_H

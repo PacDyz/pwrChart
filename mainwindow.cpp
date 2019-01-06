@@ -8,7 +8,7 @@
 #include "ChartWindow.hpp"
 MainWindow::MainWindow(QWidget* parent) : engine{}
 {
-    textButton.setTextButton("Add time connections");
+    textButton.setTextButton("Add durations of calls registered within one day");
     QQmlContext* context = engine.rootContext();
     context->setContextProperty("ListWithValuesModel", &listWithValues);
     context->setContextProperty("NameButton", &textButton);
@@ -34,6 +34,7 @@ void MainWindow::openChart()
     std::cout << "from " << from << std::endl;
     std::cout << "to " << to  << std::endl;
     QLineSeries* series = new QLineSeries();
+    series->setName("Average Intensity");
     std::vector<std::pair<int, int>> numberConnectionOnHour;
 /*    for(int h = from*60; h <= to*60; ++h)
     {
@@ -60,7 +61,7 @@ void MainWindow::openChart()
     {
         numberElements = valuesB.size();
     }
-    std::sort(valuesA.begin(), valuesA.end());
+    //std::sort(valuesA.begin(), valuesA.end());
     std::cout <<"sizeA = " << valuesA.size() << "sizeB = " << valuesB.size() << std::endl;
     for(int i = 0; i < numberElements; ++i )
     {
@@ -77,10 +78,13 @@ void MainWindow::openChart()
     //axisX->setTickCount(10);
     //chart->addAxis(axisX, Qt::AlignBottom);
     //chart->legend()->hide();
+    chart->legend()->setVisible(true);
     chart->addSeries(series);
     //series->attachAxis(axisX);
     chart->createDefaultAxes();
-    chart->setTitle("Aplitude");
+    chart->setTitle("Average Intensity Chart");
+    chart->axisX()->setTitleText("t[min]");
+    chart->axisY()->setTitleText("A[PM]");
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     window.setCentralWidget(chartView);
@@ -97,7 +101,6 @@ void MainWindow::setFilePath(QString filePath)
     bool isFirstValue = true;
     A a;
     int counter = 0;
-    int sumConnections = 0;
     std::string word;
     bool isFirstColumn = true;
         int counterRow = 0;
@@ -107,14 +110,25 @@ void MainWindow::setFilePath(QString filePath)
         {
             if(not isFirstColumn)
             {
-                auto itr = word.find("E-05");
+                auto itr = word.find(",");
                 if(itr != std::string::npos)
                 {
-                        word.erase(itr, 4);
-                        valuesB.push_back(atoi( word.c_str() ) / std::pow(10,5) * averageConnectionTime);
+                    word.at(itr) = '.';
                 }
-                valuesB.push_back(atoi( word.c_str() ) * averageConnectionTime);
-                a.averageAmplitude = QString::number(atoi( word.c_str() ) * averageConnectionTime);
+                auto itr2 = word.find("E-0");
+                if(itr2 != std::string::npos)
+                {
+                        int power = static_cast<int>(word.at(itr2 + 3)) - '0';
+                        word.erase(itr2, 4);
+                        std::cout << std::stod( word.c_str() ) << "/" << std::pow(10,power) << "*" << sumConnections << std::endl;
+                        valuesB.push_back(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
+                        a.averageAmplitude = QString::number(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
+                }
+                else
+                {
+                    valuesB.push_back(std::stod( word.c_str() ) * sumConnections);
+                    a.averageAmplitude = QString::number(std::stod( word.c_str() ) * sumConnections);
+                }
                 isFirstColumn = true;
                 qDebug() << "a = " << a.time << " " << a.averageAmplitude;
                 listWithValues.append(a);
@@ -124,9 +138,9 @@ void MainWindow::setFilePath(QString filePath)
             }
             else
             {
+                std::cout << "column A = " << word << std::endl;
                 a.time = QString::fromStdString(word);
                 valuesA.push_back(std::stoi( word));
-                std::cout << word << std::endl;
                 isFirstColumn = false;
                 continue;
             }
@@ -173,14 +187,14 @@ void MainWindow::setFilePath(QString filePath)
             std::cout << itr << std::endl;
         }*/
         firstFile = true;
-        textButton.setTextButton("Add time connections");
+        textButton.setTextButton("Add durations of calls registered within one day");
         emit textButton.textButtonChanged();
+        sumConnections = 0;
         return;
     }
     averageConnectionTime = sumConnections/counter;
     counter = 0;
-    sumConnections = 0;
-    textButton.setTextButton("Add number of connection per minute");
+    textButton.setTextButton("Add with intensity of calls [minutes in day, number of calls]");
     emit textButton.textButtonChanged();
     firstFile = false;
 }

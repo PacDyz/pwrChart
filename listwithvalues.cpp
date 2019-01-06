@@ -67,6 +67,7 @@ void ListWithValues::insert(int index, const A &a)
 
 void ListWithValues::append(const A &a)
 {
-    auto itr = std::find_if(m_data.begin(), m_data.end(), [&a](const A& aList) {return (aList.time == a.time) || aList.time > a.time;});
-    insert(std::distance(m_data.begin(), itr), a);
+    //auto itr = std::find_if(m_data.begin(), m_data.end(), [&a](const A& aList) {return (aList.time == a.time) || aList.time > a.time;});
+    //insert(std::distance(m_data.begin(), itr), a);
+    insert(m_data.count(), a);
 }
