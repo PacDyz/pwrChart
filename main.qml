@@ -15,6 +15,7 @@ Window {
 
     signal getFilePath(string filePath)
     signal openChartWindow()
+    signal openHelpWindow()
     signal saveConfiguration(int from, int to)
 
     Component {
@@ -184,6 +185,18 @@ Window {
 /*            var component = Qt.createComponent("chartWindow.qml")
             var window    = component.createObject(main_window)
             window.show()*/
+        }
+    }
+
+    Button {
+        id: help
+        text: "Help"
+        width: parent.width/2
+        height: parent.height/6
+        anchors.right: parent.right
+        anchors.top: generate_chart.bottom
+        onClicked: {
+            openHelpWindow();
         }
     }
 }

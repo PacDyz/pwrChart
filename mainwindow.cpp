@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iostream>
 #include "ChartWindow.hpp"
+#include <QTextObject>
+
 MainWindow::MainWindow(QWidget* parent) : engine{}
 {
     textButton.setTextButton("Add durations of calls registered within one day");
@@ -18,6 +20,25 @@ MainWindow::MainWindow(QWidget* parent) : engine{}
     QObject::connect(mainWindowQml, SIGNAL(getFilePath(QString)), this, SLOT(setFilePath(QString)));
     QObject::connect(mainWindowQml, SIGNAL(openChartWindow()), this, SLOT(openChart()));
     QObject::connect(mainWindowQml, SIGNAL(saveConfiguration(int, int)), this, SLOT(saveRangeChart(int,int)));
+    QObject::connect(mainWindowQml, SIGNAL(openHelpWindow()), this, SLOT(openHelp()));
+}
+
+void MainWindow::openHelp()
+{
+    helpWindow.resize(700, 500);
+    QLabel *text = new QLabel{&helpWindow};
+    text->resize(700,500);
+    text->setText("How to use: \n"
+              "First: \n"
+              "choose file by button \"Add durations of calls registered within one day\" (after that button should change name)\n"
+              "file from file system named czas\n"
+              "Second:\n"
+              "choose file by button \"Add with intensity of calls [minutes in day, number of calls]\" (button changed name)\n"
+              "Third:\n"
+              "click \"Generate Chart\"\n"
+              "More:\n"
+              "If you can changetime range, you can use edit field in top right and click SAVE CONFIGURATION\n");
+    helpWindow.show();
 }
 
 void MainWindow::saveRangeChart(int from, int to)

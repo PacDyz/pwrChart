@@ -14,6 +14,7 @@ public:
 public slots:
     void setFilePath(QString filePath);
     void openChart();
+    void openHelp();
     void saveRangeChart(int from, int to);
 
 private:
@@ -27,6 +28,7 @@ private:
     NameButton textButton;
     bool firstFile{true};
     QMainWindow window{};
+    QMainWindow helpWindow{};
     int sumConnections;
 };
 
