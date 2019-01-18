@@ -84,15 +84,21 @@ void MainWindow::openChart()
     }
     //std::sort(valuesA.begin(), valuesA.end());
     std::cout <<"sizeA = " << valuesA.size() << "sizeB = " << valuesB.size() << std::endl;
+    series->append(0.0,0.0);
     for(int i = 0; i < numberElements; ++i )
     {
         std::cout << "value A " << valuesA.at(i) << "valuesB.at(i) = " << valuesB.at(i) << std::endl;
-        if(valuesA.at(i) > this->to*60)
+        if(valuesA.at(i) >= this->to*60)
         {
             break;
         }
-        series->append(valuesA.at(i), valuesB.at(i));
+        if(valuesA.at(i) <= this->from*60)
+        {
+            continue;
+        }
+        series->append(valuesA.at(i)/60, valuesB.at(i)/60);
     }
+    series->append(this->to,0.0);
     numberConnectionOnHour.clear();
     QChart* chart = new QChart();
     //QValueAxis *axisX = new QValueAxis;
@@ -104,8 +110,12 @@ void MainWindow::openChart()
     //series->attachAxis(axisX);
     chart->createDefaultAxes();
     chart->setTitle("Average Intensity Chart");
-    chart->axisX()->setTitleText("t[min]");
-    chart->axisY()->setTitleText("A[PM]");
+    chart->axisY()->setTitleText("A[Erl]");
+    QValueAxis *axisX = new QValueAxis;
+    axisX->setTitleText("t[h]");
+    axisX->setTickCount(to - from + 1);
+    axisX->setLabelFormat("%.0f");
+    chart->setAxisX(axisX, series);
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     window.setCentralWidget(chartView);
