@@ -185,6 +185,7 @@ void MainWindow::setFilePath(QString filePath)
         {
             counter++;
             sumConnections += number;
+            std::cout << sumConnections << std::endl;
         }
         else
         {

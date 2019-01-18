@@ -35,7 +35,7 @@ Window {
         width: parent.width/2
         height: first_value_edit.height + first_value_label.height
         anchors.top: parent.top
-        text: "N" + "              " +  "t[min]" + "              " + "A[PM]"
+        text: "N" + "              " +  "t[h]" + "              " + "A[Erl]"
         font.pixelSize: 26
         horizontalAlignment: Text.AlignHCenter
     }

@@ -29,7 +29,7 @@ private:
     bool firstFile{true};
     QMainWindow window{};
     QMainWindow helpWindow{};
-    int sumConnections;
+    long long sumConnections{0};
 };
 
 #endif // MAINWINDOW_H
