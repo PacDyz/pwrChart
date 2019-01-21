@@ -43,17 +43,13 @@ void MainWindow::openHelp()
 
 void MainWindow::saveRangeChart(int from, int to)
 {
-    std::cout << "range " << from << " " << to << std::endl;
     this->from = from;
     this->to = to;
-    std::cout << "range " << this->from << " " << this->to << std::endl;
 }
 
 void MainWindow::openChart()
 {
     // ChartWindow chartWindow;
-    std::cout << "from " << from << std::endl;
-    std::cout << "to " << to  << std::endl;
     QLineSeries* series = new QLineSeries();
     series->setName("Average Intensity");
     std::vector<std::pair<int, int>> numberConnectionOnHour;
@@ -83,10 +79,8 @@ void MainWindow::openChart()
         numberElements = valuesB.size();
     }
     //std::sort(valuesA.begin(), valuesA.end());
-    std::cout <<"sizeA = " << valuesA.size() << "sizeB = " << valuesB.size() << std::endl;
     for(int i = 0; i < numberElements; ++i )
     {
-        std::cout << "value A " << valuesA.at(i) << "valuesB.at(i) = " << valuesB.at(i) << std::endl;
         if(valuesA.at(i) >= this->to*60)
         {
             break;
@@ -95,7 +89,7 @@ void MainWindow::openChart()
         {
             continue;
         }
-        series->append(valuesA.at(i)/60, valuesB.at(i)/60);
+        series->append(valuesA.at(i)/60, valuesB.at(i));
     }
     numberConnectionOnHour.clear();
     QChart* chart = new QChart();
@@ -108,10 +102,10 @@ void MainWindow::openChart()
     //series->attachAxis(axisX);
     chart->createDefaultAxes();
     chart->setTitle("Average Intensity Chart");
-    chart->axisY()->setTitleText("A[Erl]");
+    chart->axisY()->setTitleText("l.pol");
     chart->axisY()->setMin(0.0);
     QValueAxis *axisX = new QValueAxis;
-    axisX->setTitleText("t[h]");
+    axisX->setTitleText("t[min]");
     axisX->setTickCount(to - from + 1);
     axisX->setLabelFormat("%.0f");
     axisX->setRange(this->from, this->to);
@@ -127,7 +121,6 @@ void MainWindow::setFilePath(QString filePath)
 {
     const QUrl url(filePath);
     std::fstream myfile(QDir::toNativeSeparators(url.toLocalFile()).toUtf8().constData(), std::ios_base::in);
-    std::cout << filePath.toUtf8().constData() << std::endl;
     float number{0};
     bool isFirstValue = true;
     A a;
@@ -151,7 +144,6 @@ void MainWindow::setFilePath(QString filePath)
                 {
                         int power = static_cast<int>(word.at(itr2 + 3)) - '0';
                         word.erase(itr2, 4);
-                        std::cout << std::stod( word.c_str() ) << "/" << std::pow(10,power) << "*" << sumConnections << std::endl;
                         valuesB.push_back(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
                         a.averageAmplitude = QString::number(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
                 }
@@ -169,7 +161,6 @@ void MainWindow::setFilePath(QString filePath)
             }
             else
             {
-                std::cout << "column A = " << word << std::endl;
                 a.time = QString::fromStdString(word);
                 valuesA.push_back(std::stoi( word));
                 isFirstColumn = false;
@@ -185,7 +176,6 @@ void MainWindow::setFilePath(QString filePath)
         {
             counter++;
             sumConnections += number;
-            std::cout << sumConnections << std::endl;
         }
         else
         {
