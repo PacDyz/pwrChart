@@ -11,7 +11,7 @@ Window {
     visible: true
     width: 1000
     height: 600
-    title: qsTr("Telecomunication Chart")
+    title: qsTr("Srednie Natezenie ruchu")
 
     signal getFilePath(string filePath)
     signal openChartWindow()
@@ -35,7 +35,7 @@ Window {
         width: parent.width/2
         height: first_value_edit.height + first_value_label.height
         anchors.top: parent.top
-        text: "N" + "              " +  "t[min]" + "              " + "l.pol"
+        text: "N" + "              " +  "t[h]" + "              " + "l.pol"
         font.pixelSize: 26
         horizontalAlignment: Text.AlignHCenter
     }
@@ -76,7 +76,7 @@ Window {
     Label {
         id: first_value_label
         width: parent.width/4
-        text: "From [h]"
+        text: "Od [h]"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"
@@ -103,7 +103,7 @@ Window {
     Label {
         id: second_value_label
         width: parent.width/4
-        text: "To [h]"
+        text: "Do [h]"
         font.pixelSize: 15
         font.italic: true
         color: "steelblue"
@@ -130,7 +130,7 @@ Window {
 
     Button {
         id: add_point
-        text: "Save Configuration"
+        text: "Zapisz przedział czasowy"
         width: parent.width/2
         height: parent.height/6
         anchors.right: parent.right
@@ -175,7 +175,7 @@ Window {
 
     Button {
         id: generate_chart
-        text: "Generate Chart"
+        text: "Generuj wykres"
         width: parent.width/2
         height: parent.height/6
         anchors.top: add_points_from_file.bottom
@@ -190,7 +190,7 @@ Window {
 
     Button {
         id: help
-        text: "Help"
+        text: "Pomoc"
         width: parent.width/2
         height: parent.height/6
         anchors.right: parent.right

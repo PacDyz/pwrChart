@@ -6,11 +6,11 @@
 #include <fstream>
 #include <iostream>
 #include "ChartWindow.hpp"
-#include <QTextObject>
+#include <QTextEdit>
 
 MainWindow::MainWindow(QWidget* parent) : engine{}
 {
-    textButton.setTextButton("Add durations of calls registered within one day");
+    textButton.setTextButton("Dodaj czasy trwania połączeń zarejestrowanych w ciągu jednego dnia");
     QQmlContext* context = engine.rootContext();
     context->setContextProperty("ListWithValuesModel", &listWithValues);
     context->setContextProperty("NameButton", &textButton);
@@ -25,19 +25,54 @@ MainWindow::MainWindow(QWidget* parent) : engine{}
 
 void MainWindow::openHelp()
 {
-    helpWindow.resize(700, 500);
-    QLabel *text = new QLabel{&helpWindow};
-    text->resize(700,500);
-    text->setText("How to use: \n"
-              "First: \n"
-              "choose file by button \"Add durations of calls registered within one day\" (after that button should change name)\n"
-              "file from file system named czas\n"
-              "Second:\n"
-              "choose file by button \"Add with intensity of calls [minutes in day, number of calls]\" (button changed name)\n"
-              "Third:\n"
-              "click \"Generate Chart\"\n"
-              "More:\n"
-              "If you can changetime range, you can use edit field in top right and click SAVE CONFIGURATION\n");
+    helpWindow.resize(1100, 500);
+    QTextEdit *text = new QTextEdit{&helpWindow};
+    text->resize(1100,500);
+    text->setText("Jak używać [podstawowa konfiguracja]: \n\n"
+              "1. Wybrać plik przez naciśnięcie przycisku \"Dodaj czasy trwania połączeń zarejestrowanych w ciągu jednego dnia\" (po wybraniu następuje zmiana nazwy tego samego przycisku)\n"
+              "przykładowy plik z danymi nazywa się \"czas\"\n\n"
+              "2. Wybrać plik przez naciśnięcie przycisku \"Dodaj plik z intensywnością połączeń [minuty, liczba połączeń/liczba połączeń w całej dobie]\" (przycisk powraca do stanu z pierwszego punktu)\n\n"
+              "3. Wygenerować wykres naciskając \"Generuj wykres\"\n\n"
+              "Opcje dodatkowe:\n\n"
+              "Zmiana zakresu czasowego: W prawym górnym rgu znajdują się dwa pola do edycji\n"
+                  "gdzie możemy wpisać od jakiej do jakiej godziny chcemy wygenerować wykres, po uzupełnieniu pól należy kliknąć \"Zapisz konfiugrację\""
+                  "po tym można wygenerować wykres jeśli wcześniej zostały wczytane dane z plików\n"
+                  "\n"
+                  "Lista (na podstawie tych wartości generowany jest wykres): "
+                  "- kolumna nr. 1 - numery wierszy\n"
+                  "- kolumna nr. 2 - minuta pomiaru w dobie\n"
+                  "- kolumna nr. 3 liczba połączeń w danej minucie, po przeliczeniu ze stosunku [liczba połączeń w tej minucie/liczba połączeń w całej dobie]\n"
+                  "\n"
+                  "Formaty plików:\n\n"
+                  "     1. Plik z czasami trwania połączeń zarejestrowanych w ciągu jednego dnia\n"
+                  "         Liczby powinny:\n"
+                  "             - być całkowite"
+                  "             - liczby dodatnie\n"
+                  "             - jednostka - minuty\n"
+                  "             - nowa liczba w nowej linii\n"
+                  "         Przykład:\n\n"
+                  "         5\n"
+                  "         10\n"
+                  "         ...\n"
+                  "         11\n\n"
+                  "     2. Plik z intensywnością połączeń\n"
+                  "         2.1 W pierwszej kolumnie powinny znajdować się minuty pomiaru w dobie\n"
+                  "             Liczby powinny:\n"
+                  "                 - być całkowite\n"
+                  "                 - liczby dodatnie"
+                  "                 - jednostka - minuty\n"
+                  "                 - jedna liczba w wierszu i tej kolumnie\n"
+                  "         2.2 W Drugiej kolumnie powinien znajdować się stosunek (liczby połączeń w tej minucie)/(liczby połączeń w całej dobie)\n"
+                  "             Liczby powinny: \n"
+                  "                 - mogą być z rozwinięciem dziesiętnym ( po przecinku )\n"
+                  "                 - mogą być zapisane z exponentą ujemną (np. 1,23E-05)\n"
+                  "                 - jedna liczba w wierszu i tej kolumnie\n"
+                  "\n"
+                  "         Przykład:\n"
+                  "         10 0,002345\n"
+                  "         28 1,25E-03\n"
+                  "         ...\n"
+                  "         14000 0,0111");
     helpWindow.show();
 }
 
@@ -100,14 +135,21 @@ void MainWindow::openChart()
     chart->legend()->setVisible(true);
     chart->addSeries(series);
     //series->attachAxis(axisX);
-    chart->createDefaultAxes();
-    chart->setTitle("Average Intensity Chart");
-    chart->axisY()->setTitleText("l.pol");
-    chart->axisY()->setMin(0.0);
+    //chart->createDefaultAxes();
+    chart->setTitle("Średnie natężenie ruchu");
+    //chart->axisY()->setTitleText("l.pol");
+    //chart->axisY()->setMin(0.0);
     QValueAxis *axisX = new QValueAxis;
-    axisX->setTitleText("t[min]");
+    QValueAxis *axisY = new QValueAxis;
+    axisX->setTitleText("t[h]");
+    axisY->setTitleText("l.pol");
     axisX->setTickCount(to - from + 1);
+    //axisY->setMin(0.0);
+    axisY->setTickCount(10);
+    chart->setAxisY(axisY, series);
+    chart->axisY()->setMin(0.0);
     axisX->setLabelFormat("%.0f");
+    axisY->setLabelFormat("%.0f");
     axisX->setRange(this->from, this->to);
     chart->setAxisX(axisX, series);
     QChartView* chartView = new QChartView(chart);
@@ -144,13 +186,13 @@ void MainWindow::setFilePath(QString filePath)
                 {
                         int power = static_cast<int>(word.at(itr2 + 3)) - '0';
                         word.erase(itr2, 4);
-                        valuesB.push_back(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
-                        a.averageAmplitude = QString::number(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections);
+                        valuesB.push_back(std::floor(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections));
+                        a.averageAmplitude = QString::number(std::floor(std::stod( word.c_str() ) / std::pow(10,power) * sumConnections));
                 }
                 else
                 {
-                    valuesB.push_back(std::stod( word.c_str() ) * sumConnections);
-                    a.averageAmplitude = QString::number(std::stod( word.c_str() ) * sumConnections);
+                    valuesB.push_back(std::floor(std::stod( word.c_str() ) * sumConnections));
+                    a.averageAmplitude = QString::number(std::floor(std::stod( word.c_str() ) * sumConnections));
                 }
                 isFirstColumn = true;
                 qDebug() << "a = " << a.time << " " << a.averageAmplitude;
@@ -209,14 +251,14 @@ void MainWindow::setFilePath(QString filePath)
             std::cout << itr << std::endl;
         }*/
         firstFile = true;
-        textButton.setTextButton("Add durations of calls registered within one day");
+        textButton.setTextButton("Dodaj czas trwania połączeń zarejestrowanych w ciągu jednego dnia");
         emit textButton.textButtonChanged();
         sumConnections = 0;
         return;
     }
     averageConnectionTime = sumConnections/counter;
     counter = 0;
-    textButton.setTextButton("Add with intensity of calls [minutes in day, number of calls]");
+    textButton.setTextButton("Dodaj plik z intensywnością połączeń\n[minuty, liczba połączeń/liczba połączeń w całej dobie]");
     emit textButton.textButtonChanged();
     firstFile = false;
 }
